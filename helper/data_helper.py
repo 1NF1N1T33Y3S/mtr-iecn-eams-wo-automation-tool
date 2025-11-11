@@ -5,6 +5,7 @@ from typing import Self, List
 
 from constants.constants import eams_wo_id_pattern
 from constants.file_paths import iecc_centralized_log_file_path
+from helper.logging_helper import logger
 from model.work_order import WorkOrder
 
 
@@ -118,10 +119,9 @@ def parse_work_order(df: pd.DataFrame) -> List[WorkOrder]:
     for p in problems:
         for wo in work_orders:
             if wo.id == p["uuid"]:
-                print("found")
+                logger.info("found")
                 wo.execution_error_message = p["error"]
     return work_orders
 
 
-if __name__ == '__main__':
-    df = pd.read_excel(iecc_centralized_log_file_path, sheet_name="2025")
+data_helper = DataHelper()

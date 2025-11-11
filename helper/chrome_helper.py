@@ -10,7 +10,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 
-from constants.xpaths import failure_table_xpath
+from helper.logging_helper import logger
 
 
 class ChromeHelper:
@@ -141,16 +141,15 @@ class ChromeHelper:
             )
             button.click()
         except Exception as e:
-            print(f"encounter exception {e=}, continue to next step")
+            logger.error(f"encounter exception {e=}, continue to next step")
         return self
 
     def select_table_element(self, xpath: str, value_to_click: str, timeout: int) -> Self:
-        # table_element = self.driver.find_element("xpath", "//*[@aria-label='Failure Codes']")
         table_element = WebDriverWait(self.driver, timeout).until(
             EC.presence_of_element_located((By.XPATH, xpath))
         )
 
-        print(f"{table_element=}")
+        logger.info(f"{table_element=}")
         rows = table_element.find_elements(By.TAG_NAME, "tr")
         for row in rows:
             cells = row.find_elements(By.TAG_NAME, "td")
@@ -199,3 +198,6 @@ class ChromeHelper:
             self) -> Self:
         self.driver.refresh()
         return self
+
+
+chrome_helper = ChromeHelper()

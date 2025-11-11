@@ -4,6 +4,8 @@ from typing import Self
 
 from openpyxl.worksheet.worksheet import Worksheet
 
+from helper.logging_helper import logger
+
 
 class ExcelHelper:
     def __init__(self):
@@ -33,7 +35,6 @@ class ExcelHelper:
     def get_row_by_column(self, column_index: int, value: str) -> int:
         row_count = 3
         for row in self.work_sheet.iter_rows(min_row=row_count, max_row=self.max_rows + 1):
-            # print(f"{row[column_index].value=}")
             column_value = str(row[column_index].value)
             if column_value == value:
                 return row_count
@@ -41,14 +42,16 @@ class ExcelHelper:
         return -1
 
     def write(self, column_name: str, row_index: int, value: str):
-        print(f"{column_name}, {row_index}: {value}")
+        logger.info(f"writing {value=} to {column_name=}{row_index=}")
         first_row = self.work_sheet[1]
         header = [cell.value for cell in first_row]
         column_index = header.index(column_name) + 1
         self.work_sheet.cell(row=row_index, column=column_index).value = value
-        # self.work_book.save(self.file_path)
-        print("write done")
+        logger.info("write done")
 
     def save(self):
         self.work_book.save(self.file_path)
-        print("save done")
+        logger.info("save done")
+
+
+excel_helper = ExcelHelper()

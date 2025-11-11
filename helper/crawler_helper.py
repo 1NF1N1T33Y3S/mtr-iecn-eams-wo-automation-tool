@@ -9,13 +9,14 @@ from constants.xpaths import main_page_email_input_xpath, main_page_login_button
     failure_table_xpath, change_status_menu_xpath, drop_down_xpath, completed_xpath, confirm_ok_button_xpath, \
     back_to_list_view_xpath, confirm_cancel_button_xpath, status_xpath
 from helper.chrome_helper import ChromeHelper
+from helper.logging_helper import logger
 from model.work_order import WorkOrder
 
 
 class CrawlerHelper:
     def __init__(self):
         self.chrome_helper = None
-        self.timeout_in_sec = 3
+        self.timeout_in_sec = 10
 
     def set_chrome_helper(self, chrome_helper: ChromeHelper) -> Self:
         self.chrome_helper = chrome_helper
@@ -48,8 +49,8 @@ class CrawlerHelper:
         return self
 
     def close_single_wo(self, wo: WorkOrder) -> Self:
-        print(
-            f"closing {wo.id} {wo.wo_id} {wo.finish_work_date} {wo.finish_work_time} {wo.problem_code} {wo.cause_code} {wo.remedy_code}")
+        logger.info(f"closing WO {wo.wo_id=}")
+        logger.info(f"{wo.__dict__}")
         try:
             (self.chrome_helper
              .input_text(eams_wo_search_xpath, wo.wo_id, 3)
@@ -58,9 +59,11 @@ class CrawlerHelper:
              .click_button(eams_wo_list_xpath, 3)
              .sleep(3))
             value = self.chrome_helper.read_value(status_xpath, 3)
+            logger.info(f"{value=}")
             if value in ["COMP", "CANCEL"]:
-                raise Exception
-            print(f"{value=}")
+                error_message = f"{value=} is either already Completed or Cancelled"
+                logger.info(error_message)
+                raise Exception(error_message)
             (
                 self.chrome_helper
                 .click_button(change_status_menu_xpath, 3)
@@ -69,8 +72,10 @@ class CrawlerHelper:
                 .click_button(back_to_list_view_xpath, 3)
                 .sleep(3)
             )
+            logger.info(f"{wo.wo_id} close successfully")
             wo.job_status = "DONE"
         except Exception as e:
+            logger.error(f"{wo.wo_id} close failed")
             error_message = f"error in closing workorder {str(e)}"
             wo.job_status = "NOT DONE"
             wo.execution_error_message = error_message
@@ -83,3 +88,6 @@ class CrawlerHelper:
             #  .go_to_wo_tracking_page()
             #  )
         return self
+
+
+crawler_helper = CrawlerHelper()
