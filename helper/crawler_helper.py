@@ -16,7 +16,7 @@ from model.work_order import WorkOrder
 class CrawlerHelper:
     def __init__(self):
         self.chrome_helper = None
-        self.timeout_in_sec = 10
+        self.timeout_in_sec = 3
 
     def set_chrome_helper(self, chrome_helper: ChromeHelper) -> Self:
         self.chrome_helper = chrome_helper

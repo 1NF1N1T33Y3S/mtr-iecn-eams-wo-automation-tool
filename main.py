@@ -1,4 +1,6 @@
-import os
+import os, time
+from typing import List
+
 from constants.file_paths import iecc_centralized_log_file_path
 from helper.chrome_helper import ChromeHelper, chrome_helper
 from helper.crawler_helper import CrawlerHelper, crawler_helper
@@ -6,18 +8,22 @@ from helper.data_helper import DataHelper, parse_work_order, filter_df, get_faul
     get_eams_incomplete_df, data_helper
 from helper.excel_helper import ExcelHelper, excel_helper
 from helper.logging_helper import logger
+from model.work_order import WorkOrder
+
+
+def output_result_to_excel(excel: ExcelHelper, wos: List[WorkOrder]):
+    for w in wos:
+        logger.info(f"{w.id=} {w.wo_id=} {w.actual_start_date=} {w.actual_finish_date=}")
+        r = excel.get_row_by_column(0, w.id)
+        excel.write("EAMS WO Completed", r, w.job_status)
+        excel.write("EAMS WO Failure Message", r, w.execution_error_message)
+
 
 if __name__ == '__main__':
     logger.info('hello world')
     os.system("taskkill /f /im excel.exe")
-    # test_value = "5000669050"
-    # test_value = "5000682265"
-    (
-        crawler_helper
-        .set_chrome_helper(chrome_helper)
-        .login()
-        .go_to_wo_tracking_page()
-    )
+    time.sleep(10)
+
     df = (
         data_helper
         .set_file_path(iecc_centralized_log_file_path)
@@ -44,18 +50,23 @@ if __name__ == '__main__':
     clean_wo = [order for order in work_orders if order.execution_error_message is None]
     problem_wo = [order for order in work_orders if order.execution_error_message is not None]
 
-
     logger.info("closing WO")
+    (
+        crawler_helper
+        .set_chrome_helper(chrome_helper)
+        .login()
+        .go_to_wo_tracking_page()
+    )
     for wo in clean_wo:
         crawler_helper.close_single_wo(wo)
     crawler_helper.chrome_helper.driver.quit()
 
     logger.info("writing successful result in excel")
-    for wo in clean_wo:
-        logger.info(f"{wo.id=} {wo.wo_id=} {wo.actual_start_date=} {wo.actual_finish_date=}")
-        row = excel_helper.get_row_by_column(0, wo.id)
-        excel_helper.write("EAMS WO Completed", row, wo.job_status)
-        excel_helper.write("EAMS WO Failure Message", row, wo.execution_error_message)
+    success_wos = [o for o in clean_wo if o.job_status == "DONE"]
+    failed_wos = [o for o in clean_wo if o.job_status != "DONE"]
+
+    output_result_to_excel(excel_helper, success_wos)
+    output_result_to_excel(excel_helper, failed_wos)
 
     logger.info("writing problematic result in excel")
     for wo in problem_wo:

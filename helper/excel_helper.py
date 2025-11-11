@@ -47,11 +47,10 @@ class ExcelHelper:
         header = [cell.value for cell in first_row]
         column_index = header.index(column_name) + 1
         self.work_sheet.cell(row=row_index, column=column_index).value = value
-        logger.info("write done")
 
     def save(self):
         self.work_book.save(self.file_path)
-        logger.info("save done")
+        logger.info("saved")
 
 
 excel_helper = ExcelHelper()
