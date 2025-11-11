@@ -10,6 +10,8 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 
+from constants.xpaths import failure_table_xpath
+
 
 class ChromeHelper:
     def __init__(
@@ -47,6 +49,20 @@ class ChromeHelper:
         self.driver.maximize_window()
         return self
 
+    def read_value(self, x_path: str, timeout) -> str:
+        element = (
+            WebDriverWait(
+                self.driver,
+                timeout)
+            .until(
+                EC.presence_of_element_located(
+                    (By.XPATH,
+                     x_path)
+                )
+            )
+        )
+        return element.get_attribute("value")
+
     def clear_text(
             self,
             x_path: str,
@@ -66,13 +82,8 @@ class ChromeHelper:
         element.send_keys(backspaces)
         return self
 
-    def input_text(
-            self,
-            x_path: str,
-            text: str,
-            timeout: int
-    ) -> Self:
-        (
+    def clear_and_input_text(self, x_path: str, text: str, timeout: int):
+        element = (
             WebDriverWait(
                 self.driver,
                 timeout)
@@ -81,21 +92,43 @@ class ChromeHelper:
                     (By.XPATH,
                      x_path)
                 )
-            ).send_keys(text)
+            )
         )
+        element.clear()
+        element.send_keys(text)
+        return self
+
+    def input_text(
+            self,
+            x_path: str,
+            text: str,
+            timeout: int
+    ) -> Self:
+        element = (
+            WebDriverWait(
+                self.driver,
+                timeout)
+            .until(
+                EC.presence_of_element_located(
+                    (By.XPATH,
+                     x_path)
+                )
+            )
+        )
+        element.send_keys(text)
         return self
 
     def select_dropdown_element(
             self,
             id: str,
-            day: str
+            value: str
     ) -> Self:
         dropdown_element = self.driver.find_element(
             By.ID,
             id
         )
         select = Select(dropdown_element)
-        select.select_by_visible_text(day)
+        select.select_by_visible_text(value)
         return self
 
     def click_button(
@@ -109,6 +142,23 @@ class ChromeHelper:
             button.click()
         except Exception as e:
             print(f"encounter exception {e=}, continue to next step")
+        return self
+
+    def select_table_element(self, xpath: str, value_to_click: str, timeout: int) -> Self:
+        # table_element = self.driver.find_element("xpath", "//*[@aria-label='Failure Codes']")
+        table_element = WebDriverWait(self.driver, timeout).until(
+            EC.presence_of_element_located((By.XPATH, xpath))
+        )
+
+        print(f"{table_element=}")
+        rows = table_element.find_elements(By.TAG_NAME, "tr")
+        for row in rows:
+            cells = row.find_elements(By.TAG_NAME, "td")
+            for cell in cells:
+                value = cell.text
+                if value == value_to_click:
+                    cell.click()
+                    return self
         return self
 
     def select_date_from_calender(

@@ -1,27 +1,71 @@
 # 1.
-from selenium.webdriver import Keys
-
+import os
 from constants.constants import url, username, email, password
-from constants.xpaths import main_page_login_button_xpath, sso_lan_id_input_xpath, \
-    sso_lan_pw_input_xpath, sso_login_button_xpath, main_page_email_input_xpath, eams_workorder_tracking_button_xpath, \
-    eams_menu_button_xpath, eams_menu_search_xpath, eams_wo_search_xpath, eams_wo_list_xpath
+from constants.file_paths import iecc_centralized_log_file_path
 from helper.chrome_helper import ChromeHelper
 from helper.crawler_helper import CrawlerHelper
+from helper.data_helper import DataHelper, parse_work_order, filter_df, get_fault_cleared_df, filter_nan_df, \
+    get_eams_incomplete_df
+from helper.excel_helper import ExcelHelper
 
 if __name__ == '__main__':
     print('hello world')
+    # close_all_excel_instances()
+    os.system("taskkill /f /im excel.exe")
     test_value = "5000669050"
+    test_value = "5000682265"
     chrome_helper = ChromeHelper()
     crawler_helper = CrawlerHelper()
     (
         crawler_helper
         .set_chrome_helper(chrome_helper)
         .login()
-        .go_to_workorder_tracking_page()
+        .go_to_wo_tracking_page()
     )
-    crawler_helper.chrome_helper.input_text(eams_wo_search_xpath, test_value, 3)
-    crawler_helper.chrome_helper.input_text(eams_wo_search_xpath, Keys.ENTER, 3)
-    crawler_helper.chrome_helper.click_button(eams_wo_list_xpath, 3)
-    crawler_helper.chrome_helper.sleep(10)
+    data_helper = DataHelper()
+    df = (
+        data_helper
+        .set_file_path(iecc_centralized_log_file_path)
+        .set_sheet_name("2025")
+        .read_excel()
+    )
+    max_rows = len(df)
 
-    print("done")
+    excel_helper = ExcelHelper()
+    (
+        excel_helper
+        .set_file_path(iecc_centralized_log_file_path)
+        .set_sheet_name("2025")
+        .set_max_row(max_rows)
+        .read_excel()
+    )
+
+    print(f"filtering on the data")
+    fault_cleared_df = get_fault_cleared_df(df)
+    fault_cleared_n_eams_completed_df = get_eams_incomplete_df(fault_cleared_df)
+    fault_cleared_n_eams_completed_n_valid_wo_df = filter_nan_df(fault_cleared_n_eams_completed_df, "Work Order Number")
+
+    work_orders = parse_work_order(fault_cleared_n_eams_completed_n_valid_wo_df)
+
+    print("writing the result into xlsx ")
+    clean_wo = [order for order in work_orders if order.execution_error_message is None]
+    problem_wo = [order for order in work_orders if order.execution_error_message is not None]
+
+    for wo in clean_wo:
+        crawler_helper.close_single_wo(wo)
+    crawler_helper.chrome_helper.driver.quit()
+
+    for wo in clean_wo:
+        print(f"{wo.id=} {wo.wo_id=} {wo.actual_start_date=} {wo.actual_finish_date=}")
+        row = excel_helper.get_row_by_column(0, wo.id)
+        excel_helper.write("EAMS WO Completed", row, wo.job_status)
+        excel_helper.write("EAMS WO Failure Message", row, wo.execution_error_message)
+
+    for wo in problem_wo:
+        print(f"{wo.id=} {wo.wo_id=} {wo.actual_start_date=} {wo.actual_finish_date=}")
+        row = excel_helper.get_row_by_column(0, wo.id)
+        excel_helper.write("EAMS WO Completed", row, "NOT DONE")
+        excel_helper.write("EAMS WO Failure Message", row, wo.execution_error_message)
+
+    excel_helper.save()
+    # print(f"write completed")

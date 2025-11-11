@@ -15,3 +15,24 @@ eams_workorder_tracking_button_xpath = r"/html/body/div[1]/div[1]/div/div[2]/ul/
 # 4. track_order_list
 eams_wo_search_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr/td[2]/div/div[1]/div/table/tbody/tr/td/table/tbody/tr[2]/td/table/tbody/tr[2]/td/div/table/tbody/tr[3]/td/table/tbody/tr[2]/td/table/tbody/tr[2]/td[3]/input"
 eams_wo_list_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr/td[2]/div/div[1]/div/table/tbody/tr/td/table/tbody/tr[2]/td/table/tbody/tr[2]/td/div/table/tbody/tr[3]/td/table/tbody/tr[2]/td/table/tbody/tr[4]/td[3]/span"
+
+# 4b. Work Order page
+actual_start_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr/td[2]/div/div[1]/div/table/tbody/tr/td/table/tbody/tr[2]/td/table/tbody/tr[4]/td/div/table/tbody/tr/td/table/tbody/tr/td[1]/div/table/tbody/tr[1]/td/div/table/tbody/tr[2]/td/table/tbody/tr/td[3]/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr[2]/td/input"
+actual_finish_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr/td[2]/div/div[1]/div/table/tbody/tr/td/table/tbody/tr[2]/td/table/tbody/tr[4]/td/div/table/tbody/tr/td/table/tbody/tr/td[1]/div/table/tbody/tr[1]/td/div/table/tbody/tr[2]/td/table/tbody/tr/td[3]/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr[4]/td/input"
+status_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr/td[2]/div/div[1]/div/table/tbody/tr/td/table/tbody/tr[2]/td/table/tbody/tr[1]/td/div/table/tbody/tr[3]/td/table/tbody/tr/td[2]/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr[3]/td/input"
+
+# 5. failure reporting
+failure_reporting_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr/td[2]/div/div[1]/div/table/tbody/tr/td/table/tbody/tr[1]/td/div/div[1]/div[3]/ul/li[6]/a"
+select_failure_codes_button_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr/td[2]/div/div[1]/div/table/tbody/tr/td/table/tbody/tr[2]/td/table/tbody/tr[2]/td/div/table/tbody/tr[2]/td/table/tbody/tr[2]/td/div/table/tbody/tr[1]/td/table/tbody/tr/td[10]/button"
+failure_table_xpath = r"/html/body/form/div[2]/table[3]/tbody/tr/td[3]/table/tbody/tr[2]/th/table/tbody/tr/td/table[2]/tbody/tr/td/div/table/tbody/tr/td/div/table/tbody/tr[3]/td/table/tbody/tr[2]/td/table"
+
+# 6 change status button
+change_status_menu_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr/td[1]/div/div[1]/div/table/tbody/tr/td/div/div[3]/div[2]/div[3]/div[2]/div/ul/li[4]/a"
+drop_down_xpath = r"/html/body/form/div[2]/table[3]/tbody/tr/td[3]/table/tbody/tr[2]/th/table/tbody/tr/td/table[2]/tbody/tr/td/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr/td/div/table/tbody/tr[2]/td/div/table/tbody/tr/td/table/tbody/tr[4]/td/input"
+completed_xpath = r"/html/body/form/div[2]/table[1]/tbody/tr/td/div/div[1]/div/ul/li[3]/a"
+confirm_ok_button_xpath = r"/html/body/form/div[2]/table[3]/tbody/tr/td[3]/table/tbody/tr[2]/th/table/tbody/tr/td/table[3]/tbody/tr/td/table/tbody/tr/td/div/table/tbody/tr/td/button[2]"
+confirm_cancel_button_xpath = r"/html/body/form/div[2]/table[3]/tbody/tr/td[3]/table/tbody/tr[2]/th/table/tbody/tr/td/table[3]/tbody/tr/td/table/tbody/tr/td/div/table/tbody/tr/td/button[1]"
+back_to_list_view_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr/td[1]/div/div[1]/div/table/tbody/tr/td/div/div[1]/div[1]/ul/li/a"
+
+# universal save button
+save_button_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[1]/td/div/table/tbody/tr/td/table/tbody/tr[2]/td/div/table[1]/tbody/tr/td[4]/table/tbody/tr/td[2]/ul/li[2]/a"
