@@ -200,4 +200,4 @@ class ChromeHelper:
         return self
 
 
-chrome_helper = ChromeHelper()
+# chrome_helper = ChromeHelper()
