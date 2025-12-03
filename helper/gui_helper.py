@@ -2,7 +2,7 @@ from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 from kivy.core.window import Window
-import core.core
+import core
 from kivy.logger import Logger, LOG_LEVELS
 
 Logger.disabled = True
@@ -27,6 +27,6 @@ class GuiHelper(App):
             size_hint=(None, None),
             size=(200, 50)
         )
-        self.login_button.bind(on_press=core.core.main)
+        self.login_button.bind(on_press=core.main)
         layout.add_widget(self.login_button)
         return layout
