@@ -1,4 +1,6 @@
-from typing import Self
+from typing import Self, Optional, List
+
+from selenium.common import TimeoutException
 from selenium.webdriver import Keys
 
 from constants.constants import url, email, username, password
@@ -7,7 +9,8 @@ from constants.xpaths import main_page_email_input_xpath, main_page_login_button
     eams_workorder_tracking_button_xpath, eams_wo_search_xpath, eams_wo_list_xpath, actual_start_xpath, \
     actual_finish_xpath, save_button_xpath, failure_reporting_xpath, select_failure_codes_button_xpath, \
     failure_table_xpath, change_status_menu_xpath, drop_down_xpath, completed_xpath, confirm_ok_button_xpath, \
-    back_to_list_view_xpath, confirm_cancel_button_xpath, status_xpath
+    back_to_list_view_xpath, confirm_cancel_button_xpath, status_xpath, status_output_xpath, eams_wo_result_table_xpath
+from enums.eams_status import EAMSStatus
 from helper.chrome_helper import ChromeHelper
 from helper.logging_helper import logger
 from model.work_order import WorkOrder
@@ -22,6 +25,9 @@ class CrawlerHelper:
         self.chrome_helper = chrome_helper
         return self
 
+    def close(self):
+        self.chrome_helper.close()
+
     def login(self) -> Self:
         (
             self.chrome_helper
@@ -29,8 +35,9 @@ class CrawlerHelper:
             .sleep(self.timeout_in_sec)
             .input_text(main_page_email_input_xpath, email, self.timeout_in_sec)
             .click_button(main_page_login_button_xpath, self.timeout_in_sec)
+            # .sleep(self.timeout_in_sec)
+            # .input_text(sso_lan_id_input_xpath, username, self.timeout_in_sec)
             .sleep(self.timeout_in_sec)
-            .input_text(sso_lan_id_input_xpath, username, self.timeout_in_sec)
             .input_text(sso_lan_pw_input_xpath, password, self.timeout_in_sec)
             .click_button(sso_login_button_xpath, self.timeout_in_sec)
             .sleep(self.timeout_in_sec)
@@ -47,6 +54,28 @@ class CrawlerHelper:
             .sleep(self.timeout_in_sec)
         )
         return self
+
+    def search_wo(self, wo: str) -> List[str]:
+        logger.info(f"checking with wo {wo=}")
+        timeout_in_sec = 3
+        try:
+            (self.chrome_helper
+             .input_text(
+                eams_wo_search_xpath,
+                wo,
+                timeout_in_sec)
+             .input_text(eams_wo_search_xpath,
+                         Keys.ENTER,
+                         timeout_in_sec)
+             .sleep(timeout_in_sec))
+            values = self.chrome_helper.select_table_element(
+                eams_wo_result_table_xpath,
+                3)
+        except TimeoutException:
+            logger.error(f"{wo=} not found in EAMS")
+            return []
+        logger.info(f"{values=}")
+        return values
 
     def close_single_wo(self, wo: WorkOrder) -> Self:
         logger.info(f"closing WO {wo.wo_id=}")

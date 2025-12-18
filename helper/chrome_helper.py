@@ -1,5 +1,5 @@
 import time
-from typing import Self
+from typing import Self, List
 
 from selenium.webdriver import Chrome, ChromeOptions, Keys
 from selenium.webdriver.common.by import By
@@ -16,8 +16,10 @@ from helper.logging_helper import logger
 class ChromeHelper:
     def __init__(
             self):
+        self.debug = False
         chrome_options = ChromeOptions()
-        # chrome_options.add_argument("--headless=new")
+        if not self.debug:
+            chrome_options.add_argument("--headless=new")
         prefs = {
             "download.default_directory": default_download_path,
             "download.directory_upgrade": True,
@@ -31,6 +33,10 @@ class ChromeHelper:
             service=service,
             options=chrome_options
         )
+
+    def set_debug(self, is_debug: bool) -> Self:
+        self.debug = is_debug
+        return self
 
     def close(
             self) -> Self:
@@ -144,21 +150,21 @@ class ChromeHelper:
             logger.error(f"encounter exception {e=}, continue to next step")
         return self
 
-    def select_table_element(self, xpath: str, value_to_click: str, timeout: int) -> Self:
+    def select_table_element(self, xpath: str, timeout: int) -> List[str]:
         table_element = WebDriverWait(self.driver, timeout).until(
             EC.presence_of_element_located((By.XPATH, xpath))
         )
-
         logger.info(f"{table_element=}")
         rows = table_element.find_elements(By.TAG_NAME, "tr")
+        values = []
         for row in rows:
             cells = row.find_elements(By.TAG_NAME, "td")
             for cell in cells:
                 value = cell.text
-                if value == value_to_click:
-                    cell.click()
-                    return self
-        return self
+                if value == "":
+                    continue
+                values.append(value)
+        return values
 
     def select_date_from_calender(
             self,
@@ -198,6 +204,5 @@ class ChromeHelper:
             self) -> Self:
         self.driver.refresh()
         return self
-
 
 # chrome_helper = ChromeHelper()

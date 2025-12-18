@@ -1,7 +1,6 @@
 import datetime
 
 from pydantic.dataclasses import dataclass
-from typing import List
 
 
 @dataclass
