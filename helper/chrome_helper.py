@@ -18,7 +18,7 @@ class ChromeHelper:
             self):
         self.debug = False
         chrome_options = ChromeOptions()
-        if not self.debug:
+        if self.debug:
             chrome_options.add_argument("--headless=new")
         prefs = {
             "download.default_directory": default_download_path,

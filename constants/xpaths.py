@@ -38,3 +38,13 @@ back_to_list_view_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tb
 
 # universal save button
 save_button_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[1]/td/div/table/tbody/tr/td/table/tbody/tr[2]/td/div/table[1]/tbody/tr/td[4]/table/tbody/tr/td[2]/ul/li[2]/a"
+
+# work order
+# run_reports_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr/td[1]/div/div[1]/div/table/tbody/tr/td/div/div[3]/div[2]/div[3]/div[3]/div[2]/div/ul/li[5]/a"
+# three_dots_menu_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[1]/td/div/table/tbody/tr/td/table/tbody/tr[2]/td/div/table[1]/tbody/tr/td[2]/table/tbody/tr/td/div/div[2]/div[2]/input"
+# more_search_fields_xpath = r"/div/div[1]/div/ul/li[1]/a"
+work_group_input_field_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr/td[2]/div/div[1]/div/table/tbody/tr/td/table/tbody/tr[2]/td/table/tbody/tr[2]/td/div/table/tbody/tr[3]/td/table/tbody/tr[2]/td/table/tbody/tr[2]/td[5]/input"
+status_input_field_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr/td[2]/div/div[1]/div/table/tbody/tr/td/table/tbody/tr[2]/td/table/tbody/tr[2]/td/div/table/tbody/tr[3]/td/table/tbody/tr[2]/td/table/tbody/tr[2]/td[10]/input"
+refresh_report_button_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr/td[2]/div/div[1]/div/table/tbody/tr/td/table/tbody/tr[2]/td/table/tbody/tr[2]/td/div/table/tbody/tr[1]/td/table/tbody/tr/td[7]/a"
+download_button_xpath = r"/html/body/form/div[2]/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td/div/table/tbody/tr/td/div/table/tbody/tr/td/table/tbody/tr/td[2]/div/div[1]/div/table/tbody/tr/td/table/tbody/tr[2]/td/table/tbody/tr[2]/td/div/table/tbody/tr[1]/td/table/tbody/tr/td[8]/a"
+

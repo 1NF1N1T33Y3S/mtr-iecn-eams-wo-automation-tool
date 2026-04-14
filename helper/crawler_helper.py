@@ -9,7 +9,9 @@ from constants.xpaths import main_page_email_input_xpath, main_page_login_button
     eams_workorder_tracking_button_xpath, eams_wo_search_xpath, eams_wo_list_xpath, actual_start_xpath, \
     actual_finish_xpath, save_button_xpath, failure_reporting_xpath, select_failure_codes_button_xpath, \
     failure_table_xpath, change_status_menu_xpath, drop_down_xpath, completed_xpath, confirm_ok_button_xpath, \
-    back_to_list_view_xpath, confirm_cancel_button_xpath, status_xpath, status_output_xpath, eams_wo_result_table_xpath
+    back_to_list_view_xpath, confirm_cancel_button_xpath, status_xpath, status_output_xpath, eams_wo_result_table_xpath, \
+    work_group_input_field_xpath, \
+    status_input_field_xpath, refresh_report_button_xpath, download_button_xpath
 from enums.eams_status import EAMSStatus
 from helper.chrome_helper import ChromeHelper
 from helper.logging_helper import logger
@@ -51,6 +53,17 @@ class CrawlerHelper:
             .click_button(eams_menu_button_xpath, self.timeout_in_sec)
             .input_text(eams_menu_search_xpath, "work", self.timeout_in_sec)
             .click_button(eams_workorder_tracking_button_xpath, self.timeout_in_sec)
+        )
+        return self
+
+    def search_and_download_reports(self) -> Self:
+        (
+            self.chrome_helper
+            .input_text(work_group_input_field_xpath, "MIMLLSNR", 3)
+            .input_text(status_input_field_xpath, "=APPR,=REFER", 3)
+            .click_button(refresh_report_button_xpath, 3)
+            .sleep(3)
+            .click_button(download_button_xpath, 3)
             .sleep(self.timeout_in_sec)
         )
         return self

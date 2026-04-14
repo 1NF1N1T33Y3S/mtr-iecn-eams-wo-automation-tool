@@ -28,3 +28,7 @@ def map_to_eams_status(status: str) -> EAMSStatus:
     if status in ["OPEN"]:
         return EAMSStatus.OPENED
     return EAMSStatus.MISSING
+
+
+def check_records_in_eams():
+    pass
