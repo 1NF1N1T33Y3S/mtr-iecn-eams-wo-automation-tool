@@ -1,6 +1,5 @@
 import shutil
 import time
-import datetime
 import sys
 from pathlib import Path
 from typing import List
@@ -9,6 +8,7 @@ import openpyxl
 import pandas as pd
 
 from constants.constants import PROJECT_DOWNLOAD_DIR
+from constants.email_configs import RECIPIENTS, EMAIL_SUBJECT
 from constants.file_paths import template_file_path
 from exceptions.exceptions import EAMSReportNotFoundError
 from helper.chrome_helper import ChromeHelper
@@ -16,7 +16,8 @@ from helper.crawler_helper import crawler_helper
 from helper.email_manager import email_handler
 from helper.logging_helper import logger
 from model.eams_wo import EAMSWorkOrder
-from model.email import fail_email
+from model.email import get_no_work_order_email, Email
+from utils.utils import generate_timestamped_filename
 
 
 def wait_and_rename_latest(downloads_path: Path,
@@ -162,7 +163,7 @@ def process_downloaded_report(
         download_file_path: Path,
         output_file_path: Path,
         housekeeping_dir: Path
-) -> None:
+) -> List[EAMSWorkOrder]:
     """Main workflow for processing the downloaded report."""
     wait_and_rename_latest(downloads_dir, download_file_path)
 
@@ -170,6 +171,8 @@ def process_downloaded_report(
     records = read_eams_record(download_file_path)
     export_records_to_template(output_file_path, records)
     move_to_archive(output_file_path, housekeeping_dir)
+    logger.info("process_downloaded_report completed")
+    return records
 
 
 def download_report() -> None:
@@ -184,9 +187,9 @@ def download_report() -> None:
     )
 
 
-def download_report_pipeline(output_file_name: str) -> None:
+def download_report_pipeline(
+        output_file_name: str) -> List[EAMSWorkOrder]:
     logger.info("Starting the report generation pipeline...")
-
     downloads_dir = Path(PROJECT_DOWNLOAD_DIR)
     download_file_path = downloads_dir / "target_report_name.xls"
     output_dir = Path("output")
@@ -200,17 +203,17 @@ def download_report_pipeline(output_file_name: str) -> None:
         download_report()
 
         logger.info("Processing the downloaded report...")
-        process_downloaded_report(
+        return process_downloaded_report(
             downloads_dir=downloads_dir,
             download_file_path=download_file_path,
             output_file_path=output_file_path,
             housekeeping_dir=housekeeping_dir
         )
 
-        logger.info("Pipeline completed successfully.")
-
     except EAMSReportNotFoundError as e:
         logger.error(str(e))
+        fail_body = get_no_work_order_email()
+        fail_email = Email(RECIPIENTS, EMAIL_SUBJECT, fail_body)
         email_handler.send_email(fail_email)
     except Exception as e:
         logger.error(f"A critical error occurred during the report downloading pipeline execution: {e}", exc_info=True)

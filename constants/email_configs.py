@@ -8,3 +8,5 @@ RECIPIENTS: Final = [
     "camfurtkflee@mtr.com.hk",
     "LEUNGHL@mtr.com.hk"
 ]
+EMAIL_SUBJECT: Final = "[Action Required] EAMS CMCR Work Order Summary"
+

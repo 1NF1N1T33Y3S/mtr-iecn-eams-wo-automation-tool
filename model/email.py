@@ -12,19 +12,48 @@ class Email:
     attachment: Optional[List[str]] = None
 
 
-email_subject = "[Action Required] EAMS CMCR Work Order Summary"
-success_body = """
-Dear RRU,
-    Please assist to fill in the attached Excel for our close out in EAMS.
-Best Regards,
-IECC
-"""
-fail_body = """
-Dear RRU,
-    There are NO open EAMS CMCR Work Order.
-    You may ignore this email.
-Best Regards,
-IECC
-"""
-success_email = Email(RECIPIENTS, email_subject, success_body)
-fail_email = Email(RECIPIENTS, email_subject, fail_body)
+def get_no_work_order_email() -> str:
+    """
+    Returns the HTML formatted email body for the 'No Work Order' notification.
+
+    Uses standard HTML tags:
+    - <p> for paragraphs
+    - <br> for line breaks
+    - CSS 'margin-left' for the indentation you requested
+    """
+    return """
+    <html>
+        <body style="font-family: Arial, sans-serif; color: #333333;">
+            <p>Dear RRU,</p>
+
+            <p style="margin-left: 40px; color: #0055A4;">
+                There are <strong>NO</strong> open EAMS CMCR Work Orders.<br>
+                You may ignore this email.
+            </p>
+
+            <p>
+                Best Regards,<br>
+                <strong>IECC</strong>
+            </p>
+        </body>
+    </html>
+    """
+
+
+def get_report_attached_email(record_count: int) -> str:
+    """
+    Example of a dynamic template using f-strings to inject variables.
+    """
+    return f"""
+    <html>
+        <body style="font-family: Arial, sans-serif;">
+            <p>Dear RRU,</p>
+            <p>Please find the attached EAMS report.</p>
+            <p>Total records to close: <strong>{record_count}</strong></p>
+            <p>Best Regards,<br>IECC</p>
+        </body>
+    </html>
+    """
+
+
+
