@@ -191,7 +191,7 @@ def download_report_pipeline(
         output_file_name: str) -> List[EAMSWorkOrder]:
     logger.info("Starting the report generation pipeline...")
     downloads_dir = Path(PROJECT_DOWNLOAD_DIR)
-    download_file_path = downloads_dir / "target_report_name.xls"
+    download_file_path = downloads_dir / output_file_name
     output_dir = Path("output")
     output_file_path = output_dir / output_file_name
     housekeeping_dir = Path("archive/")
