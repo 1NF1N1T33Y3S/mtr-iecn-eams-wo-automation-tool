@@ -23,7 +23,8 @@ class CrawlerHelper:
         self.chrome_helper = None
         self.timeout_in_sec = 3
 
-    def set_chrome_helper(self, chrome_helper: ChromeHelper) -> Self:
+    def set_chrome_helper(self,
+                          chrome_helper: ChromeHelper) -> Self:
         self.chrome_helper = chrome_helper
         return self
 
@@ -60,7 +61,9 @@ class CrawlerHelper:
         (
             self.chrome_helper
             .input_text(work_group_input_field_xpath, "MIMLLSNR", 3)
+            .sleep(1)
             .input_text(status_input_field_xpath, "=APPR,=REFER", 3)
+            .sleep(1)
             .click_button(refresh_report_button_xpath, 3)
             .sleep(3)
             .click_button(download_button_xpath, 3)
@@ -68,7 +71,8 @@ class CrawlerHelper:
         )
         return self
 
-    def search_wo(self, wo: str) -> List[str]:
+    def search_wo(self,
+                  wo: str) -> List[str]:
         logger.info(f"checking with wo {wo=}")
         timeout_in_sec = 3
         try:
@@ -90,7 +94,8 @@ class CrawlerHelper:
         logger.info(f"{values=}")
         return values
 
-    def close_single_wo(self, wo: WorkOrder) -> Self:
+    def close_single_wo(self,
+                        wo: WorkOrder) -> Self:
         logger.info(f"closing WO {wo.wo_id=}")
         logger.info(f"{wo.__dict__}")
         try:

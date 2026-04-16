@@ -1,3 +1,4 @@
+import datetime
 from typing import List
 
 from enums.eams_status import EAMSStatus
@@ -32,3 +33,12 @@ def map_to_eams_status(status: str) -> EAMSStatus:
 
 def check_records_in_eams():
     pass
+
+
+def generate_timestamped_filename(prefix: str = "result",
+                                  extension: str = ".xls") -> str:
+    """Generates a dynamically named file string with a current timestamp."""
+    if not extension.startswith('.'):
+        extension = f".{extension}"
+    current_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S")
+    return f"{prefix}_{current_time}{extension}"

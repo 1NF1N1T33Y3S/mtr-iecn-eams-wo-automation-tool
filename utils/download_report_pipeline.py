@@ -10,19 +10,13 @@ import pandas as pd
 
 from constants.constants import PROJECT_DOWNLOAD_DIR
 from constants.file_paths import template_file_path
+from exceptions.exceptions import EAMSReportNotFoundError
 from helper.chrome_helper import ChromeHelper
 from helper.crawler_helper import crawler_helper
+from helper.email_manager import email_handler
 from helper.logging_helper import logger
 from model.eams_wo import EAMSWorkOrder
-
-
-def generate_timestamped_filename(prefix: str = "result",
-                                  extension: str = ".xls") -> str:
-    """Generates a dynamically named file string with a current timestamp."""
-    if not extension.startswith('.'):
-        extension = f".{extension}"
-    current_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S")
-    return f"{prefix}_{current_time}{extension}"
+from model.email import fail_email
 
 
 def wait_and_rename_latest(downloads_path: Path,
@@ -55,7 +49,7 @@ def wait_and_rename_latest(downloads_path: Path,
         time.sleep(2)  # Polling interval
 
     # If the loop finishes without returning, the timeout was reached
-    raise FileNotFoundError(f"No completed .xls report found in {downloads_path} after {timeout} seconds.")
+    raise EAMSReportNotFoundError(str(downloads_path))
 
 
 def read_eams_record(file_path: Path) -> List[EAMSWorkOrder]:
@@ -141,16 +135,16 @@ def move_to_archive(file_to_move: Path,
         logger.warning(f"Housekeeping failed: {e}")
 
 
-def clear_downloads(downloads_path: Path) -> None:
+def clear_folder(folder_path: Path) -> None:
     """Deletes all files in the specified directory, leaving sub-folders intact."""
-    logger.info(f"Cleaning up Downloads folder: {downloads_path}")
+    logger.info(f"Cleaning up Downloads folder: {folder_path}")
 
-    if not downloads_path.exists():
+    if not folder_path.exists():
         logger.warning("Downloads path does not exist. Skipping cleanup.")
         return
 
     file_count = 0
-    for item in downloads_path.iterdir():
+    for item in folder_path.iterdir():
         if item.is_file():
             try:
                 item.unlink()
@@ -174,9 +168,8 @@ def process_downloaded_report(
 
     logger.info("Reading records from downloaded file...")
     records = read_eams_record(download_file_path)
-
     export_records_to_template(output_file_path, records)
-    move_to_archive(download_file_path, housekeeping_dir)
+    move_to_archive(output_file_path, housekeeping_dir)
 
 
 def download_report() -> None:
@@ -191,19 +184,19 @@ def download_report() -> None:
     )
 
 
-def download_report_pipeline() -> None:
+def download_report_pipeline(output_file_name: str) -> None:
     logger.info("Starting the report generation pipeline...")
 
     downloads_dir = Path(PROJECT_DOWNLOAD_DIR)
     download_file_path = downloads_dir / "target_report_name.xls"
     output_dir = Path("output")
-    output_file_name = generate_timestamped_filename()
     output_file_path = output_dir / output_file_name
     housekeeping_dir = Path("archive/")
 
     try:
         logger.info("Initiating report download...")
-        clear_downloads(downloads_dir)
+        clear_folder(downloads_dir)
+        clear_folder(output_dir)
         download_report()
 
         logger.info("Processing the downloaded report...")
@@ -216,6 +209,11 @@ def download_report_pipeline() -> None:
 
         logger.info("Pipeline completed successfully.")
 
+    except EAMSReportNotFoundError as e:
+        logger.error(str(e))
+        email_handler.send_email(fail_email)
     except Exception as e:
         logger.error(f"A critical error occurred during the report downloading pipeline execution: {e}", exc_info=True)
+    finally:
+        logger.error("Ending the application")
         sys.exit(1)
