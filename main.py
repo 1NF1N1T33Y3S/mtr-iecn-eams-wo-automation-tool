@@ -1,4 +1,5 @@
 import os, time
+import shutil
 from pathlib import Path
 from datetime import datetime
 from typing import List
@@ -39,7 +40,7 @@ def rename_file(downloads_path: Path,
             logger.error(f"Error: A file named {new_file_path} already exists.")
 
 
-def read_eams_record(file_path):
+def read_eams_record(file_path) -> List[EAMSWorkOrder]:
     # 1. Use read_html because the file is actually an HTML table
     # This returns a list of dataframes; usually, the data is in the first one [0]
     try:
@@ -53,7 +54,6 @@ def read_eams_record(file_path):
 
     # 2. Iterate through the rows of the dataframe
     for _, row in df.iterrows():
-
         # Helper to safely convert strings to datetime
         def to_dt(val):
             if pd.isna(val) or str(val).strip() == "":
@@ -84,9 +84,9 @@ def read_eams_record(file_path):
     return work_orders
 
 
-def write_to_template(output_file_name: str,
+def write_to_template(output_file_path: str,
                       wo_records: List[EAMSWorkOrder]):
-    output_file_path = os.path.join(output_directory, output_file_name)
+    # output_file_path = os.path.join(output_directory, output_file_name)
 
     try:
         wb = openpyxl.load_workbook(template_file_path)
@@ -106,26 +106,107 @@ def write_to_template(output_file_name: str,
         logger.error(f"Error: Could not save the file. Please close '{output_file_path}' in Excel and try again.")
 
 
+def wait_and_rename_latest(downloads_path: Path, new_file_path: str, timeout=30):
+    """Waits up to 'timeout' seconds for an .xls file to appear, then renames it."""
+    start_time = time.time()
+
+    while time.time() - start_time < timeout:
+        files = list(downloads_path.glob("*.xls"))
+        if files:
+            latest_file = max(files, key=lambda p: p.stat().st_mtime)
+            # Ensure it's not a temp download file
+            if not latest_file.name.endswith('.crdownload'):
+                try:
+                    latest_file.rename(new_file_path)
+                    return True
+                except FileExistsError:
+                    return True  # Or handle as needed
+        time.sleep(2)  # Polling interval
+    return False
+
+
+def move_to_archive(file_to_move: Path, destination_folder: Path):
+    """Moves the processed file to an archive directory."""
+    try:
+        if not destination_folder.exists():
+            destination_folder.mkdir(parents=True, exist_ok=True)
+
+        target_path = destination_folder / file_to_move.name
+        shutil.move(str(file_to_move), str(target_path))
+        logger.info(f"Housekeeping: File moved to {target_path}")
+    except Exception as e:
+        logger.warning(f"Housekeeping failed: {e}")
+
+
+def clear_downloads(downloads_path: Path):
+    """
+    Deletes all files in the specified directory.
+    Does not delete sub-folders to avoid accidental data loss.
+    """
+    logger.info(f"Cleaning up Downloads folder: {downloads_path}")
+
+    if not downloads_path.exists():
+        logger.warning("Downloads path does not exist. Skipping cleanup.")
+        return
+
+    file_count = 0
+    for item in downloads_path.iterdir():
+        # Only delete files, ignore sub-directories
+        if item.is_file():
+            try:
+                item.unlink()
+                file_count += 1
+            except PermissionError:
+                logger.warning(f"Could not delete {item.name} - File is currently in use.")
+            except Exception as e:
+                logger.error(f"Error deleting {item.name}: {e}")
+
+    logger.info(f"Cleanup complete. Removed {file_count} files.")
+
+
 def main():
-    logger.info('CMCR Automation Tool')
-    logger.info("Downloading today's CM/PM Report for LAR")
-    (
-        crawler_helper
-        .set_chrome_helper(ChromeHelper())
-        .login()
-        .go_to_wo_tracking_page()
-        .search_and_download_reports()
-    )
-
-    logger.info("Renaming the downloaded report")
+    logger.info("initialization")
     current_time = datetime.now().strftime("%Y_%m_%d_%H%M%S")
-    new_filename = f"{current_time}.xls"
-    downloads_path = Path.home() / default_download_path
-    eams_wo_order_path = downloads_path / new_filename
+    output_file_name = f"result_{current_time}.xls"
 
-    rename_file(downloads_path, str(eams_wo_order_path))
-    records = read_eams_record(str(eams_wo_order_path))
-    write_to_template("output.xlsx", records)
+    downloads_dir = Path.home() / default_download_path
+    output_dir = Path(output_directory)
+    housekeeping_dir = output_dir / "Archive"
+    download_file_path = downloads_dir / output_file_name
+    output_file_path = output_dir / output_file_name
+
+    clear_downloads(downloads_dir)
+    try:
+        logger.info("Downloading today's CM/PM Report for LAR...")
+        (
+            crawler_helper
+            .set_chrome_helper(ChromeHelper())
+            .login()
+            .go_to_wo_tracking_page()
+            .search_and_download_reports()
+        )
+
+        success = wait_and_rename_latest(downloads_dir, str(download_file_path))
+        if not success:
+            raise FileNotFoundError("The report was not found in the Downloads folder after the crawler finished.")
+        logger.info("Reading record from downloaded HTML-XLS...")
+
+        records = read_eams_record(str(download_file_path))
+        if not records:
+            logger.warning("File was read, but no work order records were found.")
+        else:
+            write_to_template(str(output_file_path), records)
+        move_to_archive(download_file_path, housekeeping_dir)
+
+    except Exception as e:
+        # Graceful User Notification
+        logger.error("-" * 50)
+        logger.error(f"CRITICAL ERROR IN FLOW: {str(e)}")
+        logger.error("Please check your internet connection or EAMS credentials.")
+        logger.error("-" * 50)
+        # You could also trigger a system popup or email here
+    finally:
+        logger.info("CMCR Process Finished.")
 
 
 if __name__ == '__main__':

@@ -22,6 +22,7 @@ class EAMSWorkOrder:
     def determine_line(self):
         line_mapping = {
             "AEL": "AELnTCL",
+            "TCL": "AELnTCL",
             "DRL": "DRL"
         }
         line = self.asset.split("-")[0]
