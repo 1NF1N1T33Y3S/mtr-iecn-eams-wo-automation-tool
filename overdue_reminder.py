@@ -2,7 +2,7 @@ import re
 import pandas as pd
 from typing import List
 
-from constants.constants import eams_wo_id_pattern
+from constants.constants import EAMS_WO_ID_PATTERN
 from constants.email_configs import RECIPIENTS
 from constants.file_paths import iecc_centralized_log_file_path
 from constants.html_table_template import html_table_style, html_table_header, html_table_footer
@@ -22,7 +22,7 @@ from utils.utils import map_to_eams_status, map_eams_status
 
 
 def get_eams_wo_number(value: str) -> str:
-    is_found = re.search(eams_wo_id_pattern, value)
+    is_found = re.search(EAMS_WO_ID_PATTERN, value)
     if is_found:
         return is_found.group()
     return "invalid"

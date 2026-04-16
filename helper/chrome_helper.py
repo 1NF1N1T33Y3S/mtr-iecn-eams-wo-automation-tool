@@ -5,7 +5,7 @@ from selenium.webdriver import Chrome, ChromeOptions, Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
-from constants.constants import default_download_path, chrome_driver_path
+from constants.constants import PROJECT_DOWNLOAD_DIR, CHROME_DRIVER_PATH
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
@@ -21,13 +21,13 @@ class ChromeHelper:
         if self.debug:
             chrome_options.add_argument("--headless=new")
         prefs = {
-            "download.default_directory": default_download_path,
+            "download.default_directory": PROJECT_DOWNLOAD_DIR,
             "download.directory_upgrade": True,
             "download.prompt_for_download": False,
         }
         chrome_options.add_experimental_option("prefs", prefs)
         service = Service(
-            executable_path=chrome_driver_path
+            executable_path=CHROME_DRIVER_PATH
         )
         self.driver = Chrome(
             service=service,

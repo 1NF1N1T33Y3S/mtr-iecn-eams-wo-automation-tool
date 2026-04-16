@@ -3,7 +3,7 @@ import re
 import pandas as pd
 from typing import Self, List
 
-from constants.constants import eams_wo_id_pattern
+from constants.constants import EAMS_WO_ID_PATTERN
 from constants.file_paths import iecc_centralized_log_file_path
 from helper.logging_helper import logger
 from model.work_order import WorkOrder
@@ -98,7 +98,7 @@ def parse_work_order(df: pd.DataFrame) -> List[WorkOrder]:
             each_id_splits = each_id.split(" ")
             for each_id_split in each_id_splits:
                 clean_id = each_id_split.rstrip().lstrip()
-                match = re.match(eams_wo_id_pattern, clean_id)
+                match = re.match(EAMS_WO_ID_PATTERN, clean_id)
                 if match:
                     work_order = WorkOrder(
                         id=uuid,
