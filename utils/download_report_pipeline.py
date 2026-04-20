@@ -8,7 +8,7 @@ import openpyxl
 import pandas as pd
 
 from constants.constants import PROJECT_DOWNLOAD_DIR
-from constants.email_configs import RECIPIENTS, EMAIL_SUBJECT
+from constants.email_configs import LAR_RECIPIENTS, EMAIL_SUBJECT, TEST_RECIPIENTS
 from constants.file_paths import template_file_path
 from exceptions.exceptions import EAMSReportNotFoundError
 from helper.chrome_helper import ChromeHelper
@@ -213,7 +213,7 @@ def download_report_pipeline(
     except EAMSReportNotFoundError as e:
         logger.error(str(e))
         fail_body = get_no_work_order_email()
-        fail_email = Email(RECIPIENTS, EMAIL_SUBJECT, fail_body)
+        fail_email = Email(LAR_RECIPIENTS, EMAIL_SUBJECT, fail_body)
         email_handler.send_email(fail_email)
     except Exception as e:
         logger.error(f"A critical error occurred during the report downloading pipeline execution: {e}", exc_info=True)

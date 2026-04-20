@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import List
-
-from constants.email_configs import RECIPIENTS, EMAIL_SUBJECT
+from constants.email_configs import EMAIL_SUBJECT, LAR_RECIPIENTS
 from helper.email_manager import email_handler
 from helper.logging_helper import logger
 from model.eams_wo import EAMSWorkOrder
@@ -25,9 +24,10 @@ def process_eams_report_pipeline(
     if has_files(output_dir):
         logger.info("file exists")
         success_body = get_report_attached_email(len(records))
-        success_email = Email(RECIPIENTS, EMAIL_SUBJECT, success_body, attachments)
-        email_handler.send_email(success_email)
+        email = Email(LAR_RECIPIENTS, EMAIL_SUBJECT, success_body, attachments)
     else:
+        logger.info("file doesn't exist")
         fail_body = get_no_work_order_email()
-        fail_email = Email(RECIPIENTS, EMAIL_SUBJECT, fail_body)
-        email_handler.send_email(fail_email)
+        email = Email(LAR_RECIPIENTS, EMAIL_SUBJECT, fail_body)
+
+    email_handler.send_email(email)

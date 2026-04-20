@@ -16,6 +16,11 @@ class EAMSWorkOrder:
     job_plan: str
     target_start_datetime: datetime.datetime
     target_finish_datetime: datetime.datetime
+    line: str
+    failure_class: Optional[str] = None
+    problem: Optional[str] = None
+    cause: Optional[str] = None
+    remedy: Optional[str] = None
     actual_start_datetime: Optional[datetime.datetime] = None
     actual_finish_datetime: Optional[datetime.datetime] = None
 

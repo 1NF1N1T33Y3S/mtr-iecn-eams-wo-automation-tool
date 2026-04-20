@@ -11,7 +11,7 @@ from constants.xpaths import main_page_email_input_xpath, main_page_login_button
     failure_table_xpath, change_status_menu_xpath, drop_down_xpath, completed_xpath, confirm_ok_button_xpath, \
     back_to_list_view_xpath, confirm_cancel_button_xpath, status_xpath, status_output_xpath, eams_wo_result_table_xpath, \
     work_group_input_field_xpath, \
-    status_input_field_xpath, refresh_report_button_xpath, download_button_xpath
+    status_input_field_xpath, refresh_report_button_xpath, download_button_xpath, work_type_input_field_xpath
 from enums.eams_status import EAMSStatus
 from helper.chrome_helper import ChromeHelper
 from helper.logging_helper import logger
@@ -62,7 +62,9 @@ class CrawlerHelper:
             self.chrome_helper
             .input_text(work_group_input_field_xpath, "MIMLLSNR", 3)
             .sleep(1)
-            .input_text(status_input_field_xpath, "=APPR,=REFER", 3)
+            .input_text(work_type_input_field_xpath, "=CM-CR", 3)
+            .sleep(1)
+            .input_text(status_input_field_xpath, "=APPR,=INPRG", 3)
             .sleep(1)
             .click_button(refresh_report_button_xpath, 3)
             .sleep(3)
