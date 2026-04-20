@@ -23,13 +23,11 @@ def get_no_work_order_email() -> str:
     return """
     <html>
         <body style="font-family: Arial, sans-serif; color: #333333;">
-            <p>Dear RRU,</p>
-
+            <p>Dear Duty E-shift Supervisor/ Technical Officer,</p>
             <p style="margin-left: 40px; color: #0055A4;">
                 There are <strong>NO</strong> open EAMS CMCR Work Orders.<br>
                 You may ignore this email.
             </p>
-
             <p>
                 Best Regards,<br>
                 <strong>IECC</strong>
@@ -46,7 +44,7 @@ def get_report_attached_email(record_count: int) -> str:
     return f"""
     <html>
         <body style="font-family: Arial, sans-serif;">
-            <p>Dear Duty E-shift Supervisor/ Technical Officer,,</p>
+            <p>Dear Duty E-shift Supervisor/ Technical Officer,</p>
             <p>Please fill in the details of the work orders you have completed and return the Daily Outstanding job reminder to IECC on or before 17:00.</p>
             <p>Total records to close: <strong>{record_count}</strong></p>
             <p>Best Regards,<br>IECC</p>
