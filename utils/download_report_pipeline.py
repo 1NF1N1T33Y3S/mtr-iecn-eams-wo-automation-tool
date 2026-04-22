@@ -2,7 +2,7 @@ import shutil
 import time
 import sys
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import openpyxl
 import pandas as pd
@@ -162,7 +162,6 @@ def process_downloaded_report(
         downloads_dir: Path,
         download_file_path: Path,
         output_file_path: Path,
-        housekeeping_dir: Path
 ) -> List[EAMSWorkOrder]:
     """Main workflow for processing the downloaded report."""
     wait_and_rename_latest(downloads_dir, download_file_path)
@@ -170,7 +169,6 @@ def process_downloaded_report(
     logger.info("Reading records from downloaded file...")
     records = read_eams_record(download_file_path)
     export_records_to_template(output_file_path, records)
-    move_to_archive(output_file_path, housekeeping_dir)
     logger.info("process_downloaded_report completed")
     return records
 
@@ -184,17 +182,17 @@ def download_report() -> None:
         .login()
         .go_to_wo_tracking_page()
         .search_and_download_reports()
+        .close()
     )
 
 
 def download_report_pipeline(
-        output_file_name: str) -> List[EAMSWorkOrder]:
+        output_file_name: str) -> Optional[List[EAMSWorkOrder]]:
     logger.info("Starting the report generation pipeline...")
     downloads_dir = Path(PROJECT_DOWNLOAD_DIR)
     download_file_path = downloads_dir / output_file_name
     output_dir = Path("output")
     output_file_path = output_dir / output_file_name
-    housekeeping_dir = Path("archive/")
 
     try:
         logger.info("Initiating report download...")
@@ -206,8 +204,7 @@ def download_report_pipeline(
         return process_downloaded_report(
             downloads_dir=downloads_dir,
             download_file_path=download_file_path,
-            output_file_path=output_file_path,
-            housekeeping_dir=housekeeping_dir
+            output_file_path=output_file_path
         )
 
     except EAMSReportNotFoundError as e:
@@ -217,6 +214,5 @@ def download_report_pipeline(
         email_handler.send_email(fail_email)
     except Exception as e:
         logger.error(f"A critical error occurred during the report downloading pipeline execution: {e}", exc_info=True)
-    finally:
         logger.error("Ending the application")
         sys.exit(1)

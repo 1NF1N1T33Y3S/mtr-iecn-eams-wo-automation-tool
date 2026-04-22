@@ -14,7 +14,7 @@ def has_files(directory_path: Path) -> bool:
     return any(item.is_file() for item in directory_path.iterdir())
 
 
-def process_eams_report_pipeline(
+def email_based_on_eams_report(
         output_file_name: str,
         records: List[EAMSWorkOrder]):
     output_dir = Path("output")

@@ -16,7 +16,7 @@ class EAMSWorkOrder:
     job_plan: str
     target_start_datetime: datetime.datetime
     target_finish_datetime: datetime.datetime
-    line: str
+    line: Optional[str] = None
     failure_class: Optional[str] = None
     problem: Optional[str] = None
     cause: Optional[str] = None

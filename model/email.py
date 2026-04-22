@@ -45,7 +45,7 @@ def get_report_attached_email(record_count: int) -> str:
     <html>
         <body style="font-family: Arial, sans-serif;">
             <p>Dear Duty E-shift Supervisor/ Technical Officer,</p>
-            <p>Please fill in the details of the work orders you have completed and return the Daily Outstanding job reminder to IECC on or before 17:00.</p>
+            <p>Please fill in the details of the work orders you have completed and return the Daily Outstanding job reminder to IECC on or before 14:00.</p>
             <p>Total records to close: <strong>{record_count}</strong></p>
             <p>Best Regards,<br>IECC</p>
         </body>
