@@ -1,6 +1,6 @@
 import datetime
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Union
 
 
 @dataclass
@@ -14,15 +14,16 @@ class EAMSWorkOrder:
     location: str
     status: str
     job_plan: str
-    target_start_datetime: datetime.datetime
-    target_finish_datetime: datetime.datetime
+    target_start_datetime: Union[datetime.datetime, str]
+    target_finish_datetime: Union[datetime.datetime, str]
+    programmatic_status: Optional[str] = None
     line: Optional[str] = None
     failure_class: Optional[str] = None
     problem: Optional[str] = None
     cause: Optional[str] = None
     remedy: Optional[str] = None
-    actual_start_datetime: Optional[datetime.datetime] = None
-    actual_finish_datetime: Optional[datetime.datetime] = None
+    actual_start_datetime: Optional[Union[datetime.datetime, str]] = None
+    actual_finish_datetime: Optional[Union[datetime.datetime, str]] = None
 
     def determine_line(self):
         line_mapping = {

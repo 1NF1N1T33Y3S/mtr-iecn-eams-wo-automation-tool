@@ -126,12 +126,12 @@ class ChromeHelper:
 
     def select_dropdown_element(
             self,
-            id: str,
+            x_path: str,
             value: str
     ) -> Self:
         dropdown_element = self.driver.find_element(
-            By.ID,
-            id
+            By.XPATH,
+            x_path
         )
         select = Select(dropdown_element)
         select.select_by_visible_text(value)
