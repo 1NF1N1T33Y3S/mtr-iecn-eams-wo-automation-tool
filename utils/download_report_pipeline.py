@@ -126,7 +126,7 @@ def export_records_to_template(output_file_path: Path,
 
 def move_to_archive(file_to_move: Path,
                     destination_folder: Path) -> None:
-    """Moves the processed file to an archive directory."""
+    """Moves the processed file to an 0.archive directory."""
     try:
         destination_folder.mkdir(parents=True, exist_ok=True)
         target_path = destination_folder / file_to_move.name

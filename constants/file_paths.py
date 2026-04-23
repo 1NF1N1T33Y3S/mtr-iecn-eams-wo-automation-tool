@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from typing import final
 
@@ -11,4 +12,10 @@ rru_template_directory = r"C:\Users\leecamkf\PycharmProjects\iecn-eams-workorder
 template_file_name = r"cmwo-template.xlsx"
 template_file_path = os.path.join(rru_template_directory, template_file_name)
 
-output_directory = r"C:\Users\leecamkf\PycharmProjects\iecn-eams-workorder-automation-tool\output"
+input_directory = r"1.to_process"
+output_directory = r"output"
+archive_directory = r"0.archive"
+
+INPUT_DIR_PATH = Path(input_directory)
+OUTPUT_DIR_PATH = Path(output_directory)
+ARCHIVE_DIR_PATH = Path(archive_directory)

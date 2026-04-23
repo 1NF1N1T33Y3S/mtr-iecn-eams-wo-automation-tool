@@ -66,14 +66,6 @@ def extract_r_code(text: str) -> Optional[str]:
     return None
 
 
-def get_failure_code_row_xpath() -> str:
-    """
-    Generates a dynamic XPath to locate a specific table row by its text content.
-    Using `normalize-space()` is a best practice to protect against hidden whitespace.
-    """
-    return f"//table[@aria-label='Failure Codes']]]"
-
-
 class CrawlerHelper:
     def __init__(self):
         self.chrome_helper = None
@@ -152,46 +144,44 @@ class CrawlerHelper:
         logger.info(f"{values=}")
         return values
 
-    def loop_through_table_and_select_value(self,
-                                            table_element: WebElement,
-                                            matching_value: str
-                                            ) -> bool:
-        if not table_element:
-            logger.warning("No table element provided.")
-            return
-
-        rows = table_element.find_elements(By.XPATH, ".//tr")
-
-        for row_index, row in enumerate(rows):
-            cells = row.find_elements(By.XPATH, ".//*[self::td or self::th]")
-            for cell in cells:
-                cell_value = cell.text.strip()
-                print(f"Row {row_index}: {cell_value}")
-                if matching_value == cell_value:
-                    print(f"match is found f{matching_value=} == {cell_value=}")
-                    cell.click()
-                    return True
+    @staticmethod
+    def loop_through_table_and_select_value(table_elements: List[WebElement],
+                                            matching_value: str) -> bool:
+        if len(table_elements) == 0:
+            return False
+        for table_element in table_elements:
+            if not table_element:
+                logger.warning("No table element provided.")
+                return False
+            rows = table_element.find_elements(By.XPATH, ".//tr")
+            for row_index, row in enumerate(rows):
+                cells = row.find_elements(By.XPATH, ".//*[self::td or self::th]")
+                for cell in cells:
+                    cell_value = cell.text.strip()
+                    logger.info(f"Row {row_index}: {cell_value}")
+                    if matching_value == cell_value:
+                        logger.info(f"match is found f{matching_value=} == {cell_value=}")
+                        cell.click()
+                        return True
         return False
 
     def select_table_element_by_xpath(self,
                                       element_id: str,
                                       timeout: int,
-                                      failure_code: str
+                                      matching_value: str
                                       ):
         logger.info("checking table element")
         div_element: WebElement = WebDriverWait(self.chrome_helper.driver, timeout).until(
             EC.presence_of_element_located((By.ID, element_id))
         )
         tables = div_element.find_elements(By.TAG_NAME, "table")
-        for t in tables:
-            if self.loop_through_table_and_select_value(t, failure_code):
-                break
-        logger.info("debug")
+        if self.loop_through_table_and_select_value(tables, matching_value):
+            return
 
     def close_single_wo(self,
                         wo: EAMSWorkOrder) -> Self:
         logger.info(f"closing WO {wo.work_order_id=}")
-        logger.info(f"{wo.__dict__}")
+        logger.info(f"{wo.__dict__=}")
         try:
             (self.chrome_helper
              .input_text(eams_wo_search_xpath, wo.work_order_id, 3)
@@ -212,8 +202,6 @@ class CrawlerHelper:
                 .click_button(select_failure_codes_xpath, 3)
                 .sleep(2)
             )
-            # get table element
-            table_elements_xpath = get_failure_code_row_xpath()
             failure_code = extract_reference_code(wo.problem, prefix="P-IMD")
             component_code = extract_reference_code(wo.cause, prefix="C-COMP")
             remedy_code = extract_r_code(wo.remedy)
@@ -224,8 +212,11 @@ class CrawlerHelper:
             self.select_table_element_by_xpath("wolistfailurecodes_bodydiv", 3, remedy_code)
             self.chrome_helper.sleep(2)
             self.chrome_helper.click_button(change_status_menu_xpath, 3)
+            self.chrome_helper.sleep(1)
             self.chrome_helper.click_button(drop_down_xpath, 3)
+            self.chrome_helper.sleep(1)
             self.chrome_helper.click_button(complete_button_xpath, 3)
+            self.chrome_helper.sleep(1)
             self.chrome_helper.click_button(change_status_ok_button_xpath, 3)
 
             logger.info(f"{wo.work_order_id} close successfully")
@@ -235,6 +226,7 @@ class CrawlerHelper:
             error_message = f"error in closing workorder {str(e)}"
             wo.programmatic_status = "NOT DONE"
             wo.execution_error_message = error_message
+        finally:
             self.go_to_wo_tracking_page()
         return self
 

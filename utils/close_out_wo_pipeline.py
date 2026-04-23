@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Union, Dict
+from typing import Union, Dict, List
 import pandas as pd
 
 from helper.chrome_helper import ChromeHelper
@@ -47,11 +47,12 @@ def read_all_excel_sheets(file_path: Union[str, Path]) -> Dict[str, pd.DataFrame
         return {}
 
 
-def close_single_wo(r: EAMSWorkOrder):
+def close_eams_wos(records: List[EAMSWorkOrder]):
     (
         crawler_helper
         .set_chrome_helper(ChromeHelper())
         .login()
         .go_to_wo_tracking_page()
-        .close_single_wo(r)
     )
+    for record in records:
+        crawler_helper.close_single_wo(record)
